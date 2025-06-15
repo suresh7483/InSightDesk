@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="results-page">
+    <h1>Analysis Results</h1>
+    <div class="grid-container">
+        {% for key, value in results.items() %}
+        <div class="grid-item">
+            <strong>{{ key }}:</strong> {{ value }}
+        </div>
+        {% endfor %}
+    </div>
+    <button id="runAppButton">Run Application</button>
+    <h2>Text Files in Directory</h2>
+    <div class="grid-container" id="fileList"></div>
+    <a href="{{ url_for('upload_file') }}" class="button">Upload another file</a>
+
+    <script>
+        $(document).ready(function() {
+            $('#runAppButton').click(function() {
+                $.post('/run_app', function(response) {
+                    if (response.status === 'success') {
+                        alert('Application started successfully!');
+                    } else {
+                        alert('Error starting application: ' + response.message);
+                    }
+                });
+            });
+
+            $.get('/list_files', function(response) {
+                if (response.status === 'success') {
+                    let fileList = $('#fileList');
+                    fileList.empty();
+                    response.files.forEach(function(file) {
+                        fileList.append('<div class="grid-item">' + file + '</div>');
+                    });
+                } else {
+                    alert('Error listing files: ' + response.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
